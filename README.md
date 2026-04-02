@@ -52,9 +52,6 @@ docker-compose down
 
 ## Скриншоты
 
-> _Добавьте скриншоты в папку `screenshots/` и вставьте их сюда_
-
-```
 screenshots/
 ├── 01-form.png        — форма с вопросами
 ├── 02-submitted.png   — экран «Спасибо!»
