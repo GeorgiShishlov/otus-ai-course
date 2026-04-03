@@ -57,7 +57,7 @@ screenshots/
 ├── 02-submitted.png   — экран «Спасибо!»
 └── 03-answers.png     — GET /answers в браузере
 
-<img width="1911" height="847" alt="03-answers" src="https://github.com/user-attachments/assets/549affe2-6cad-4859-a556-2a14289f6c07" />
+<img width="1911" height="341" alt="03-answers" src="https://github.com/user-attachments/assets/07ebd540-62bf-40b9-93d6-0d4399ac317a" />
 <img width="462" height="247" alt="02-submitted" src="https://github.com/user-attachments/assets/a403b660-b57e-45c0-bc8f-f7cc75336740" />
 <img width="624" height="880" alt="01-form" src="https://github.com/user-attachments/assets/77f2059f-bcce-4cdc-a315-514cd12126eb" />
 
