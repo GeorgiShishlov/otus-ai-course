@@ -41,6 +41,7 @@ docker-compose up -d
 
 - Frontend: [http://localhost:3000](http://localhost:3000)
 - Backend API: [http://localhost:8000](http://localhost:8000)
+- Посмотреть ответы: [http://localhost:8000/answers](http://localhost:8000/answers)
 
 ### Остановка
 
