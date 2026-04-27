@@ -116,7 +116,7 @@ homework-1-full-stack/
 │   ├── requirements.txt
 │   ├── config/            # Настройки Django
 │   └── survey/            # Приложение (модели, views, urls)
-└── frond/                 # Next.js frontend
+└── front/                 # Next.js frontend
     ├── Dockerfile
     └── src/app/page.tsx   # Главная страница анкеты
 ```

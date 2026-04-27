@@ -12,7 +12,7 @@ Full-stack "Mini-Survey" app: Django REST API backend + Next.js frontend, contai
 homework-1-full-stack/
 ├── docker-compose.yml
 ├── back/          # Django backend (port 8000)
-└── frond/         # Next.js frontend (port 3000)
+└── front/         # Next.js frontend (port 3000)
 ```
 
 ## Running the project
@@ -32,7 +32,7 @@ python manage.py runserver
 
 ### Frontend locally
 ```bash
-cd frond
+cd front
 npm run dev
 ```
 
@@ -58,12 +58,12 @@ python manage.py shell -c "from survey.models import SurveyAnswer; SurveyAnswer.
 
 ## Frontend (Next.js)
 
-- **Next.js 16 + React 19 + Tailwind CSS 3** — all UI in `frond/src/app/page.tsx`
+- **Next.js 16 + React 19 + Tailwind CSS 3** — all UI in `front/src/app/page.tsx`
 - Single `'use client'` page: fetches questions on mount, posts answers on submit, shows thank-you screen
 - API base URL via `NEXT_PUBLIC_API_URL` env var (falls back to `http://localhost:8000`)
-- Tailwind config at `frond/tailwind.config.js`, globals at `frond/src/app/globals.css`
+- Tailwind config at `front/tailwind.config.js`, globals at `front/src/app/globals.css`
 
 If you see a hydration mismatch, clear the cache:
 ```bash
-rm -rf frond/.next
+rm -rf front/.next
 ```
