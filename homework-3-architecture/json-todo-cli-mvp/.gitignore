@@ -1,0 +1,46 @@
+# Virtual environment
+venv/
+.env/
+env/
+ENV/
+
+# IDE
+.idea/
+*.iml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Установленные пакеты
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Data
+json_data/*.json
+*.db
+*.sqlite
+
+# Логи и базы данных
+*.log
+*.sqlite3
+
+# Personal notes (если хочешь игнорировать)
+Информативность_сообщений.md
+дневник.md
+IDEAS.md
+QUESTIONS.md
+pattern_note.md
+test.py
+git_github.md
+branches_CLI_interface.md
+hashing.md
+дневник_один_день.md
