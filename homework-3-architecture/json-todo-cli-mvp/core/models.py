@@ -1,16 +1,12 @@
+# [TODO-MVP]
 import copy
 import uuid
 from datetime import datetime
 from passlib.hash import bcrypt
 
-pwd_context = bcrypt.using()
+from core.validators import TASK_STATUSES, validate_status
 
-TASK_STATUSES = {
-    1: "не начато",
-    2: "в процессе",
-    3: "завершено",
-    4: "отложено"
-}
+pwd_context = bcrypt.using()
 
 
 class User:
@@ -144,10 +140,12 @@ class Task:
 
         if type(value) is str:
             try:
-                datetime.strptime(value, '%Y-%m-%d %H:%M')
-            except ValueError:
-                raise ValueError("Неверный формат даты. Ожидается: YYYY-MM-DD HH:MM")
-            return datetime.strptime(value, '%Y-%m-%d %H:%M')
+                return datetime.strptime(value, '%Y-%m-%d %H:%M')
+            except ValueError as e:
+                raise ValueError(
+                    f"Неверный формат даты создания. Ожидается: YYYY-MM-DD HH:MM. "
+                    f"Получено: '{value}'. Причина: {e}"
+                ) from e
 
         if type(value) is datetime:
             return value
@@ -223,11 +221,7 @@ class Task:
 
     @status_task.setter
     def status_task(self, value: int):
-        if type(value) is not int:
-            raise TypeError(f"Статус должен быть int {TASK_STATUSES.keys()}")
-
-        if value not in TASK_STATUSES.keys():
-            raise ValueError(f"Неверный статус задачи. Допустимые значения: {TASK_STATUSES.keys()}")
+        validate_status(value)
         self.__status_task = value
 
     @property

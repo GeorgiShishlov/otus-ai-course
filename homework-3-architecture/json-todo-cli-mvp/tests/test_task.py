@@ -1,3 +1,4 @@
+# [TODO-MVP]
 import pytest
 import uuid
 from datetime import datetime, timedelta
@@ -445,6 +446,12 @@ class TestValidateDate:
         assert result.day == expected_datetime.day
         assert result.hour == expected_datetime.hour
         assert result.minute == expected_datetime.minute
+
+    def test_validate_date_invalid_month_error_contains_value(self):
+        """Сообщение ValueError должно содержать невалидное значение (регрессия бага month=13)"""
+        bad_value = "2020-13-01 00:00"
+        with pytest.raises(ValueError, match=re.escape(bad_value)):
+            Task._validate_date(bad_value)
 
     def test_validate_date_from_string_has_no_extra_precision(self):
         """Тест, что дата из строки не имеет лишней точности"""
