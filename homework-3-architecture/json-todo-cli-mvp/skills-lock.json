@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "jest-testing": {
+      "source": "pluginagentmarketplace/custom-plugin-nodejs",
+      "sourceType": "github",
+      "skillPath": "skills/jest-testing/SKILL.md",
+      "computedHash": "b10ce8ae142c8802fb740a6875746cd144ec318cecc53cc8969bbc681e94b723"
+    },
+    "nodejs-best-practices": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nodejs-best-practices/SKILL.md",
+      "computedHash": "6500f0617cb3bf5e5e565b42f5606365792591d3bdb1b2bd9cad3ef63a08ea39"
+    },
+    "nodejs-express-server": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "skillPath": "skills/nodejs-express-server/SKILL.md",
+      "computedHash": "8a7fe50351131f99b7bc7750bb4be6e7cbd7919b3b346c8fc7f857fb1ecad059"
+    }
+  }
+}
