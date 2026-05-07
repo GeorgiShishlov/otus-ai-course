@@ -21,11 +21,12 @@ json-todo-cli-mvp/
 ├── core/
 │   ├── models.py         ← Domain entities: User, UserManager, Task, TaskManager.
 │   ├── service.py        ← Application service: TodoService orchestrates managers.
-│   └── storage.py        ← Data layer: JSONStorage reads/writes JSON files.
+│   ├── storage.py        ← Data layer: JSONStorage reads/writes JSON files.
+│   └── validators.py     ← Shared validation: TASK_STATUSES constant + validate_status().
 └── tests/
-    ├── test_task.py       ← Comprehensive Task unit tests (524 lines).
+    ├── test_task.py       ← Task unit tests: _validate_date, status, id, name, dates.
     ├── test_storage.py    ← JSONStorage tests.
-    └── test_models.py     ← Placeholder — not yet implemented.
+    └── test_models.py     ← UserManager unit tests (17 cases).
 ```
 
 ### Key entities & glossary
@@ -217,3 +218,55 @@ git diff --name-only HEAD | grep "\.py$" | xargs -I{} head -1 {}
 ```
 
 Every line in that output must be `# [TODO-MVP]`. Files you do not touch are exempt.
+
+---
+
+## 9. Known Issues
+
+Pre-existing defects — do not mask, do not work around silently. Report them when encountered.
+
+| # | Where | Description | Impact |
+|---|-------|-------------|--------|
+| 1 | `tests/test_task.py` — `task_fabric` fixture | Fixture does not include `user_id` parameter, but `Task.__init__()` requires it. ~60 tests fail with `TypeError: missing 1 required positional argument: 'user_id'`. | Tests in `TestTaskID`, `TestTaskName`, `TestTaskCreateDate`, `TestTaskDescription`, `TestTaskStatus`, `TestTaskDueDate` and integration tests are broken. |
+| 2 | `core/service.py` | Methods `change_name_task_by_user`, `change_description_task_by_user`, `change_due_date_task_by_user`, `get_changes` are stubs (`pass`). | Editing task fields via service layer is not implemented. |
+
+---
+
+## 10. Used Prompts
+
+All prompts issued to the AI agent during this project's development, in chronological order.
+
+---
+
+### Prompt 1 — Scenario C: Write UserManager tests
+
+```
+Напиши тесты для `UserManager` в `tests/test_models.py`. Покрой: создание пользователя,
+проверку логина на дублирование, аутентификацию (верный/неверный пароль), удаление
+пользователя, сериализацию `to_dict` / `from_dict`.
+```
+
+**Result:** `tests/test_models.py` created — 17 tests, all green. Agent followed response format (plan → code → explanation → verification). Marker `# [TODO-MVP]` present on line 1.
+
+---
+
+### Prompt 2 — Scenario B: Fix silent ValueError in _validate_date
+
+```
+Баг: при вызове `task.due_date = "2020-13-01 00:00"` приложение падает с
+`ValueError: month must be in 1..12` без понятного сообщения. Исправь — ошибка должна
+говорить, какое значение невалидно и почему.
+```
+
+**Result:** `core/models.py` — `_validate_date` now raises `ValueError` with bad value and original cause in the message. Side effect: also fixed pre-existing text mismatch `"даты"` → `"даты создания"` that was breaking 11 `TestValidateDate` tests. New regression test added. Markers present.
+
+---
+
+### Prompt 3 — Scenario D: Refactor status validation to validators.py
+
+```
+Рефакторинг: вынеси дублирующиеся строки валидации статуса задачи из `models.py`
+и `service.py` в отдельный модуль `core/validators.py`. Поведение не должно измениться.
+```
+
+**Result:** `core/validators.py` created with `TASK_STATUSES` and `validate_status()`. `core/models.py` updated — setter body replaced with single `validate_status(value)` call. Agent correctly noted that `service.py` had no status validation to extract (no silent scope expansion). No circular imports. All previously-passing tests still pass.
