@@ -1,0 +1,157 @@
+@startuml json-todo-cli-mvp
+title json-todo-cli-mvp — Диаграмма классов (C4 Level 4)
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+skinparam packageFontSize 14
+skinparam ArrowColor #444444
+skinparam ClassBorderColor #1168BD
+skinparam ClassBackgroundColor #DDEEFF
+
+' ──────────────────────────────────────────
+package "core/validators" #EEEEEE {
+    class Validators <<module>> {
+        + TASK_STATUSES : dict
+        ..1=не начато 2=в процессе 3=завершено 4=отложено..
+        + validate_status(value: int) : None
+    }
+}
+
+' ──────────────────────────────────────────
+package "core/models" #EEEEEE {
+
+    class User {
+        - __user_id : UUID
+        - __login : str
+        - __password : str
+        ==
+        + user_id : UUID       <<property>>
+        + login : str          <<property>>
+        + password : str       <<property>>
+        --
+        + change_password(new_password: str) : None
+        + check_password(password: str) : bool
+    }
+
+    class UserManager {
+        + user_list : dict[UUID, User]
+        ==
+        + create_user(name: str, password: str) : User
+        + check_login(username: str) : bool
+        + check_user_password(username: str, password: str) : bool
+        + change_user_password(user_id: UUID, new_password: str) : None
+        + get_user_id(username: str) : UUID
+        + delete_user(user_id: UUID) : None
+        + to_dict() : list
+        + {static} from_dict(data: list) : dict
+        - __get_user_by_login(username: str) : User
+    }
+
+    class Task {
+        - __id_task : UUID
+        - __name_task : str          ' ≤ 20 символов
+        - __created_date : datetime
+        - __description_task : str   ' ≤ 300 символов
+        - __status_task : int        ' 1–4
+        - __due_date : datetime
+        + user_id : UUID
+        ==
+        + MAX_NAME_LENGTH : int = 20
+        + MAX_DESCRIPTION_LENGTH : int = 300
+        ==
+        + id_task : UUID             <<property>>
+        + name_task : str            <<property>>
+        + created_date : datetime    <<property>>
+        + description_task : str     <<property>>
+        + status_task : int          <<property>>
+        + due_date : datetime        <<property>>
+        --
+        + {static} _validate_date(value) : datetime
+    }
+
+    class TaskManager {
+        + task_list : dict[UUID, Task]
+        ==
+        + create_task(name_task: str, user_id: UUID, ...) : Task
+        + get_task_list() : dict
+        + get_task_list_by_user_id(user_id: UUID) : list[Task]
+        + change_status_task(task_id: UUID, new_status: int) : None
+        + delete_task(task_id: UUID) : None
+        + to_dict() : list
+        + {static} from_dict(data: list) : dict
+    }
+}
+
+' ──────────────────────────────────────────
+package "core/storage" #EEEEEE {
+    class JSONStorage {
+        - file_path : str
+        ==
+        + load_data() : list
+        + save_data(data: list) : None
+    }
+}
+
+' ──────────────────────────────────────────
+package "core/service" #EEEEEE {
+    class TodoService {
+        - __users_manager : UserManager
+        - __tasks_manager : TaskManager
+        - __user_id : UUID
+        - __username : str
+        - __current_task_mapping : dict
+        ==
+        + user_id : UUID             <<property>>
+        + username : str             <<property>>
+        + current_task_mapping : dict <<property>>
+        --
+        + {static} validate_password(password: str) : tuple[bool, str]
+        + {static} hash_password_passlib(password: str) : str
+        + login(username: str, password: str) : int
+        + logout() : None
+        + register_user(username, password1, password2) : int
+        + change_password(old_password, new_password) : int
+        + save_users_data() : None
+        + save_tasks_data() : None
+        + reload_users_data() : None
+        + reload_tasks_data() : None
+        + show_all_tasks_by_user() : list[Task]
+        + add_task_by_user(name_task: str, ...) : None
+        + change_status_task(task_id: UUID, new_status: int) : None
+        + delete_user() : None
+        + delete_task(id_task: UUID) : None
+    }
+}
+
+' ──────────────────────────────────────────
+package "cli" #EEEEEE {
+    class MainMenu <<module>> {
+        + show_main_menu(service: TodoService) : None
+        + show_user_menu(service: TodoService) : None
+        + register_user(service: TodoService) : None
+        + login_user(service: TodoService) : None
+        + show_all_tasks(service: TodoService) : None
+        + add_new_task(service: TodoService) : None
+        + change_status_task_(service: TodoService) : None
+        + del_task(service: TodoService) : None
+        + change_password(service: TodoService) : None
+        + delete_user(service: TodoService) : None
+    }
+}
+
+' ──────────────────────────────────────────
+' Relationships
+' ──────────────────────────────────────────
+
+UserManager "1" *-- "0..*" User       : содержит >
+TaskManager "1" *-- "0..*" Task       : содержит >
+
+TodoService "1" *-- "1" UserManager   : управляет >
+TodoService "1" *-- "1" TaskManager   : управляет >
+TodoService      ..>      JSONStorage  : читает/сохраняет >
+
+Task             ..>      Validators   : validate_status() >
+
+MainMenu         ..>      TodoService  : вызывает методы >
+
+@enduml

@@ -39,14 +39,23 @@
 - Проверочное требование §8: каждый изменённый `.py` файл должен начинаться с `# [TODO-MVP]` — машинопроверяемое доказательство следования инструкциям.
 - Практическая проверка через агента: выполнены три задачи по сценариям из `CLAUDE.md` — написание тестов, исправление бага, рефакторинг.
 - Добавлена C4-модель архитектуры (`workspace.dsl`) — 4 диаграммы: System Context, Containers, Components (Console App), Components (JSON Files).
+- Добавлена диаграмма классов (`class_diagram.puml`) — C4 Level 4: все классы, атрибуты, методы и связи.
 
 **Просмотр C4-модели (Structurizr):**
 ```powershell
 docker run -it --rm -p 8080:8080 `
-  -v "F:\Otus\otus-ai-course\homework-3-architecture\json-todo-cli-mvp:/usr/local/structurizr" `
+  -v "PATH_TO_PROJECT:/usr/local/structurizr" `
   structurizr/structurizr local
 ```
 Открыть: http://localhost:8080
+
+**Просмотр диаграммы классов (PlantUML):**
+
+Способ 1 — онлайн: открыть [plantuml.com/plantuml](https://www.plantuml.com/plantuml/uml/), вставить содержимое `class_diagram.puml`.
+
+Способ 2 — VS Code: установить расширение **PlantUML** (jebbs), открыть файл, нажать `Alt+D`.
+
+Способ 3 — IntelliJ / PyCharm: плагин **PlantUML Integration**, превью открывается автоматически.
 
 **Добавлены три Claude Code skills** (`.agents/skills/`):
 
