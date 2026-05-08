@@ -38,6 +38,15 @@
 - Добавлен `CLAUDE.md` — инструкции для Claude Code: контекст проекта, карта модулей, глоссарий, ограничения, правила кода и тестов, формат ответа агента, 4 типовых сценария с промптами и Definition of Done, Known Issues, раздел с использованными промптами.
 - Проверочное требование §8: каждый изменённый `.py` файл должен начинаться с `# [TODO-MVP]` — машинопроверяемое доказательство следования инструкциям.
 - Практическая проверка через агента: выполнены три задачи по сценариям из `CLAUDE.md` — написание тестов, исправление бага, рефакторинг.
+- Добавлена C4-модель архитектуры (`workspace.dsl`) — 4 диаграммы: System Context, Containers, Components (Console App), Components (JSON Files).
+
+**Просмотр C4-модели (Structurizr):**
+```powershell
+docker run -it --rm -p 8080:8080 `
+  -v "F:\Otus\otus-ai-course\homework-3-architecture\json-todo-cli-mvp:/usr/local/structurizr" `
+  structurizr/structurizr local
+```
+Открыть: http://localhost:8080
 
 **Добавлены три Claude Code skills** (`.agents/skills/`):
 
