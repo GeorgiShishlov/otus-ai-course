@@ -1,0 +1,429 @@
+{
+  "configuration" : { },
+  "description" : "Учебное Python CLI для управления TODO задачами. 3-слойная архитектура.",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedDate" : "2026-05-08T10:35:08Z",
+  "model" : {
+    "people" : [ {
+      "description" : "Запускает приложение из терминала, работает с консольным меню",
+      "id" : "1",
+      "name" : "Пользователь",
+      "properties" : {
+        "structurizr.dsl.identifier" : "user"
+      },
+      "relationships" : [ {
+        "description" : "Запускает python main.py, работает через консольное меню",
+        "destinationId" : "2",
+        "id" : "27",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "containers" : [ {
+        "components" : [ {
+          "description" : "Слой представления. Консольные меню, ввод и вывод. Не содержит бизнес-логики.",
+          "documentation" : { },
+          "id" : "4",
+          "name" : "CLI / Main Menu",
+          "properties" : {
+            "structurizr.dsl.identifier" : "cliLayer"
+          },
+          "relationships" : [ {
+            "description" : "Вызывает методы сервиса",
+            "destinationId" : "5",
+            "id" : "11",
+            "sourceId" : "4",
+            "tags" : "Relationship",
+            "technology" : "Python method calls"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "cli/main_menu.py"
+        }, {
+          "description" : "Сервисный слой — фасад. Оркестрирует UserManager и TaskManager. Хранит состояние сессии (user_id, username). Валидация пароля.",
+          "documentation" : { },
+          "id" : "5",
+          "name" : "TodoService",
+          "properties" : {
+            "structurizr.dsl.identifier" : "todoService"
+          },
+          "relationships" : [ {
+            "description" : "Управляет пользователями",
+            "destinationId" : "6",
+            "id" : "12",
+            "sourceId" : "5",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Управляет задачами",
+            "destinationId" : "7",
+            "id" : "13",
+            "sourceId" : "5",
+            "tags" : "Relationship"
+          }, {
+            "description" : "Загружает и сохраняет данные",
+            "destinationId" : "10",
+            "id" : "14",
+            "sourceId" : "5",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "core/service.py"
+        }, {
+          "description" : "Коллекция User-объектов в памяти. CRUD + аутентификация через bcrypt. Сериализация to_dict / from_dict.",
+          "documentation" : { },
+          "id" : "6",
+          "name" : "UserManager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "userManager"
+          },
+          "relationships" : [ {
+            "description" : "Создаёт и хранит объекты User",
+            "destinationId" : "8",
+            "id" : "15",
+            "sourceId" : "6",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "core/models.py"
+        }, {
+          "description" : "Коллекция Task-объектов в памяти. CRUD + фильтрация по user_id. Сериализация to_dict / from_dict.",
+          "documentation" : { },
+          "id" : "7",
+          "name" : "TaskManager",
+          "properties" : {
+            "structurizr.dsl.identifier" : "taskManager"
+          },
+          "relationships" : [ {
+            "description" : "Создаёт и хранит объекты Task",
+            "destinationId" : "8",
+            "id" : "16",
+            "sourceId" : "7",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "core/models.py"
+        }, {
+          "description" : "Доменные сущности с валидацией через @property-сеттеры. Task: UUID, name ≤20 chars, status 1-4, due_date, user_id. User: UUID, login, bcrypt-hash.",
+          "documentation" : { },
+          "id" : "8",
+          "name" : "Task / User Entities",
+          "properties" : {
+            "structurizr.dsl.identifier" : "entities"
+          },
+          "relationships" : [ {
+            "description" : "Task.status_task setter вызывает validate_status()",
+            "destinationId" : "9",
+            "id" : "17",
+            "sourceId" : "8",
+            "tags" : "Relationship"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "core/models.py"
+        }, {
+          "description" : "Разделяемая валидация статусов. TASK_STATUSES {1-4} + validate_status(value: int). Не зависит от других модулей.",
+          "documentation" : { },
+          "id" : "9",
+          "name" : "Validators",
+          "properties" : {
+            "structurizr.dsl.identifier" : "validators"
+          },
+          "tags" : "Element,Component",
+          "technology" : "core/validators.py"
+        }, {
+          "description" : "Слой данных. Читает и записывает один JSON-файл. Создаёт файл и директорию json_data/ если отсутствуют.",
+          "documentation" : { },
+          "id" : "10",
+          "name" : "JSONStorage",
+          "properties" : {
+            "structurizr.dsl.identifier" : "jsonStorage"
+          },
+          "relationships" : [ {
+            "description" : "Читает / записывает",
+            "destinationId" : "19",
+            "id" : "21",
+            "sourceId" : "10",
+            "tags" : "Relationship",
+            "technology" : "File I/O"
+          }, {
+            "description" : "Читает / записывает",
+            "destinationId" : "18",
+            "id" : "22",
+            "linkedRelationshipId" : "21",
+            "sourceId" : "10",
+            "technology" : "File I/O"
+          }, {
+            "description" : "Читает / записывает",
+            "destinationId" : "20",
+            "id" : "25",
+            "sourceId" : "10",
+            "tags" : "Relationship",
+            "technology" : "File I/O"
+          } ],
+          "tags" : "Element,Component",
+          "technology" : "core/storage.py"
+        } ],
+        "description" : "Python-процесс: принимает ввод, выполняет бизнес-логику, сохраняет данные",
+        "documentation" : { },
+        "id" : "3",
+        "name" : "Console App",
+        "properties" : {
+          "structurizr.dsl.identifier" : "consoleApp"
+        },
+        "relationships" : [ {
+          "description" : "Читает / записывает",
+          "destinationId" : "19",
+          "id" : "23",
+          "linkedRelationshipId" : "21",
+          "sourceId" : "3",
+          "technology" : "File I/O"
+        }, {
+          "description" : "Читает / записывает",
+          "destinationId" : "18",
+          "id" : "24",
+          "linkedRelationshipId" : "21",
+          "sourceId" : "3",
+          "technology" : "File I/O"
+        }, {
+          "description" : "Читает / записывает",
+          "destinationId" : "20",
+          "id" : "26",
+          "linkedRelationshipId" : "25",
+          "sourceId" : "3",
+          "technology" : "File I/O"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Python 3.11"
+      }, {
+        "components" : [ {
+          "description" : "Массив объектов: {id, login, password}. Пароль хранится как bcrypt-хэш.",
+          "documentation" : { },
+          "id" : "19",
+          "name" : "users.json",
+          "properties" : {
+            "structurizr.dsl.identifier" : "usersJson"
+          },
+          "tags" : "Element,Component",
+          "technology" : "json_data/users.json"
+        }, {
+          "description" : "Массив объектов: {id, title, description, status, due_date, created_date, user_id}.",
+          "documentation" : { },
+          "id" : "20",
+          "name" : "tasks.json",
+          "properties" : {
+            "structurizr.dsl.identifier" : "tasksJson"
+          },
+          "tags" : "Element,Component",
+          "technology" : "json_data/tasks.json"
+        } ],
+        "description" : "Постоянное хранилище на диске. Два файла создаются автоматически при первом запуске.",
+        "documentation" : { },
+        "id" : "18",
+        "name" : "JSON Files",
+        "properties" : {
+          "structurizr.dsl.identifier" : "jsonFiles"
+        },
+        "tags" : "Element,Container,Database",
+        "technology" : "JSON / Filesystem"
+      } ],
+      "description" : "Python CLI для регистрации, аутентификации и управления персональными задачами. Данные хранятся в JSON-файлах на диске.",
+      "documentation" : { },
+      "id" : "2",
+      "name" : "Console TODO App",
+      "properties" : {
+        "structurizr.dsl.identifier" : "todoSystem"
+      },
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "json-todo-cli-mvp",
+  "properties" : {
+    "structurizr.inspection.error" : "10",
+    "structurizr.dsl" : "d29ya3NwYWNlICJqc29uLXRvZG8tY2xpLW12cCIgItCj0YfQtdCx0L3QvtC1IFB5dGhvbiBDTEkg0LTQu9GPINGD0L/RgNCw0LLQu9C10L3QuNGPIFRPRE8g0LfQsNC00LDRh9Cw0LzQuC4gMy3RgdC70L7QudC90LDRjyDQsNGA0YXQuNGC0LXQutGC0YPRgNCwLiIgewoKICAgIG1vZGVsIHsKCiAgICAgICAgdXNlciA9IHBlcnNvbiAi0J/QvtC70YzQt9C+0LLQsNGC0LXQu9GMIiAi0JfQsNC/0YPRgdC60LDQtdGCINC/0YDQuNC70L7QttC10L3QuNC1INC40Lcg0YLQtdGA0LzQuNC90LDQu9CwLCDRgNCw0LHQvtGC0LDQtdGCINGBINC60L7QvdGB0L7Qu9GM0L3Ri9C8INC80LXQvdGOIgoKICAgICAgICB0b2RvU3lzdGVtID0gc29mdHdhcmVTeXN0ZW0gIkNvbnNvbGUgVE9ETyBBcHAiICJQeXRob24gQ0xJINC00LvRjyDRgNC10LPQuNGB0YLRgNCw0YbQuNC4LCDQsNGD0YLQtdC90YLQuNGE0LjQutCw0YbQuNC4INC4INGD0L/RgNCw0LLQu9C10L3QuNGPINC/0LXRgNGB0L7QvdCw0LvRjNC90YvQvNC4INC30LDQtNCw0YfQsNC80LguINCU0LDQvdC90YvQtSDRhdGA0LDQvdGP0YLRgdGPINCyIEpTT04t0YTQsNC50LvQsNGFINC90LAg0LTQuNGB0LrQtS4iIHsKCiAgICAgICAgICAgIGNvbnNvbGVBcHAgPSBjb250YWluZXIgIkNvbnNvbGUgQXBwIiAiUHl0aG9uLdC/0YDQvtGG0LXRgdGBOiDQv9GA0LjQvdC40LzQsNC10YIg0LLQstC+0LQsINCy0YvQv9C+0LvQvdGP0LXRgiDQsdC40LfQvdC10YEt0LvQvtCz0LjQutGDLCDRgdC+0YXRgNCw0L3Rj9C10YIg0LTQsNC90L3Ri9C1IiAiUHl0aG9uIDMuMTEiIHsKCiAgICAgICAgICAgICAgICBjbGlMYXllciA9IGNvbXBvbmVudCAiQ0xJIC8gTWFpbiBNZW51IiAi0KHQu9C+0Lkg0L/RgNC10LTRgdGC0LDQstC70LXQvdC40Y8uINCa0L7QvdGB0L7Qu9GM0L3Ri9C1INC80LXQvdGOLCDQstCy0L7QtCDQuCDQstGL0LLQvtC0LiDQndC1INGB0L7QtNC10YDQttC40YIg0LHQuNC30L3QtdGBLdC70L7Qs9C40LrQuC4iICJjbGkvbWFpbl9tZW51LnB5IgoKICAgICAgICAgICAgICAgIHRvZG9TZXJ2aWNlID0gY29tcG9uZW50ICJUb2RvU2VydmljZSIgItCh0LXRgNCy0LjRgdC90YvQuSDRgdC70L7QuSDigJQg0YTQsNGB0LDQtC4g0J7RgNC60LXRgdGC0YDQuNGA0YPQtdGCIFVzZXJNYW5hZ2VyINC4IFRhc2tNYW5hZ2VyLiDQpdGA0LDQvdC40YIg0YHQvtGB0YLQvtGP0L3QuNC1INGB0LXRgdGB0LjQuCAodXNlcl9pZCwgdXNlcm5hbWUpLiDQktCw0LvQuNC00LDRhtC40Y8g0L/QsNGA0L7Qu9GPLiIgImNvcmUvc2VydmljZS5weSIKCiAgICAgICAgICAgICAgICB1c2VyTWFuYWdlciA9IGNvbXBvbmVudCAiVXNlck1hbmFnZXIiICLQmtC+0LvQu9C10LrRhtC40Y8gVXNlci3QvtCx0YrQtdC60YLQvtCyINCyINC/0LDQvNGP0YLQuC4gQ1JVRCArINCw0YPRgtC10L3RgtC40YTQuNC60LDRhtC40Y8g0YfQtdGA0LXQtyBiY3J5cHQuINCh0LXRgNC40LDQu9C40LfQsNGG0LjRjyB0b19kaWN0IC8gZnJvbV9kaWN0LiIgImNvcmUvbW9kZWxzLnB5IgoKICAgICAgICAgICAgICAgIHRhc2tNYW5hZ2VyID0gY29tcG9uZW50ICJUYXNrTWFuYWdlciIgItCa0L7Qu9C70LXQutGG0LjRjyBUYXNrLdC+0LHRitC10LrRgtC+0LIg0LIg0L/QsNC80Y/RgtC4LiBDUlVEICsg0YTQuNC70YzRgtGA0LDRhtC40Y8g0L/QviB1c2VyX2lkLiDQodC10YDQuNCw0LvQuNC30LDRhtC40Y8gdG9fZGljdCAvIGZyb21fZGljdC4iICJjb3JlL21vZGVscy5weSIKCiAgICAgICAgICAgICAgICBlbnRpdGllcyA9IGNvbXBvbmVudCAiVGFzayAvIFVzZXIgRW50aXRpZXMiICLQlNC+0LzQtdC90L3Ri9C1INGB0YPRidC90L7RgdGC0Lgg0YEg0LLQsNC70LjQtNCw0YbQuNC10Lkg0YfQtdGA0LXQtyBAcHJvcGVydHkt0YHQtdGC0YLQtdGA0YsuIFRhc2s6IFVVSUQsIG5hbWUg4omkMjAgY2hhcnMsIHN0YXR1cyAxLTQsIGR1ZV9kYXRlLCB1c2VyX2lkLiBVc2VyOiBVVUlELCBsb2dpbiwgYmNyeXB0LWhhc2guIiAiY29yZS9tb2RlbHMucHkiCgogICAgICAgICAgICAgICAgdmFsaWRhdG9ycyA9IGNvbXBvbmVudCAiVmFsaWRhdG9ycyIgItCg0LDQt9C00LXQu9GP0LXQvNCw0Y8g0LLQsNC70LjQtNCw0YbQuNGPINGB0YLQsNGC0YPRgdC+0LIuIFRBU0tfU1RBVFVTRVMgezEtNH0gKyB2YWxpZGF0ZV9zdGF0dXModmFsdWU6IGludCkuINCd0LUg0LfQsNCy0LjRgdC40YIg0L7RgiDQtNGA0YPQs9C40YUg0LzQvtC00YPQu9C10LkuIiAiY29yZS92YWxpZGF0b3JzLnB5IgoKICAgICAgICAgICAgICAgIGpzb25TdG9yYWdlID0gY29tcG9uZW50ICJKU09OU3RvcmFnZSIgItCh0LvQvtC5INC00LDQvdC90YvRhS4g0KfQuNGC0LDQtdGCINC4INC30LDQv9C40YHRi9Cy0LDQtdGCINC+0LTQuNC9IEpTT04t0YTQsNC50LsuINCh0L7Qt9C00LDRkdGCINGE0LDQudC7INC4INC00LjRgNC10LrRgtC+0YDQuNGOIGpzb25fZGF0YS8g0LXRgdC70Lgg0L7RgtGB0YPRgtGB0YLQstGD0Y7Rgi4iICJjb3JlL3N0b3JhZ2UucHkiCgogICAgICAgICAgICAgICAgIyAtLS0g0KHQstGP0LfQuCDQvNC10LbQtNGDINC60L7QvNC/0L7QvdC10L3RgtCw0LzQuCAtLS0KICAgICAgICAgICAgICAgIGNsaUxheWVyIC0+IHRvZG9TZXJ2aWNlICLQktGL0LfRi9Cy0LDQtdGCINC80LXRgtC+0LTRiyDRgdC10YDQstC40YHQsCIgIlB5dGhvbiBtZXRob2QgY2FsbHMiCiAgICAgICAgICAgICAgICB0b2RvU2VydmljZSAtPiB1c2VyTWFuYWdlciAi0KPQv9GA0LDQstC70Y/QtdGCINC/0L7Qu9GM0LfQvtCy0LDRgtC10LvRj9C80LgiCiAgICAgICAgICAgICAgICB0b2RvU2VydmljZSAtPiB0YXNrTWFuYWdlciAi0KPQv9GA0LDQstC70Y/QtdGCINC30LDQtNCw0YfQsNC80LgiCiAgICAgICAgICAgICAgICB0b2RvU2VydmljZSAtPiBqc29uU3RvcmFnZSAi0JfQsNCz0YDRg9C20LDQtdGCINC4INGB0L7RhdGA0LDQvdGP0LXRgiDQtNCw0L3QvdGL0LUiCiAgICAgICAgICAgICAgICB1c2VyTWFuYWdlciAtPiBlbnRpdGllcyAi0KHQvtC30LTQsNGR0YIg0Lgg0YXRgNCw0L3QuNGCINC+0LHRitC10LrRgtGLIFVzZXIiCiAgICAgICAgICAgICAgICB0YXNrTWFuYWdlciAtPiBlbnRpdGllcyAi0KHQvtC30LTQsNGR0YIg0Lgg0YXRgNCw0L3QuNGCINC+0LHRitC10LrRgtGLIFRhc2siCiAgICAgICAgICAgICAgICBlbnRpdGllcyAtPiB2YWxpZGF0b3JzICJUYXNrLnN0YXR1c190YXNrIHNldHRlciDQstGL0LfRi9Cy0LDQtdGCIHZhbGlkYXRlX3N0YXR1cygpIgogICAgICAgICAgICB9CgogICAgICAgICAgICBqc29uRmlsZXMgPSBjb250YWluZXIgIkpTT04gRmlsZXMiICLQn9C+0YHRgtC+0Y/QvdC90L7QtSDRhdGA0LDQvdC40LvQuNGJ0LUg0L3QsCDQtNC40YHQutC1LiDQlNCy0LAg0YTQsNC50LvQsCDRgdC+0LfQtNCw0Y7RgtGB0Y8g0LDQstGC0L7QvNCw0YLQuNGH0LXRgdC60Lgg0L/RgNC4INC/0LXRgNCy0L7QvCDQt9Cw0L/Rg9GB0LrQtS4iICJKU09OIC8gRmlsZXN5c3RlbSIgewogICAgICAgICAgICAgICAgdGFncyAiRGF0YWJhc2UiCgogICAgICAgICAgICAgICAgdXNlcnNKc29uID0gY29tcG9uZW50ICJ1c2Vycy5qc29uIiAi0JzQsNGB0YHQuNCyINC+0LHRitC10LrRgtC+0LI6IHtpZCwgbG9naW4sIHBhc3N3b3JkfS4g0J/QsNGA0L7Qu9GMINGF0YDQsNC90LjRgtGB0Y8g0LrQsNC6IGJjcnlwdC3RhdGN0YguIiAianNvbl9kYXRhL3VzZXJzLmpzb24iCiAgICAgICAgICAgICAgICB0YXNrc0pzb24gPSBjb21wb25lbnQgInRhc2tzLmpzb24iICLQnNCw0YHRgdC40LIg0L7QsdGK0LXQutGC0L7Qsjoge2lkLCB0aXRsZSwgZGVzY3JpcHRpb24sIHN0YXR1cywgZHVlX2RhdGUsIGNyZWF0ZWRfZGF0ZSwgdXNlcl9pZH0uIiAianNvbl9kYXRhL3Rhc2tzLmpzb24iCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgICMgLS0tINCh0LLRj9C30Lgg0LzQtdC20LTRgyDQutC+0L3RgtC10LnQvdC10YDQsNC80LggLS0tCiAgICAgICAgICAgIGpzb25TdG9yYWdlIC0+IHVzZXJzSnNvbiAi0KfQuNGC0LDQtdGCIC8g0LfQsNC/0LjRgdGL0LLQsNC10YIiICJGaWxlIEkvTyIKICAgICAgICAgICAganNvblN0b3JhZ2UgLT4gdGFza3NKc29uICLQp9C40YLQsNC10YIgLyDQt9Cw0L/QuNGB0YvQstCw0LXRgiIgIkZpbGUgSS9PIgogICAgICAgIH0KCiAgICAgICAgIyAtLS0g0KHQuNGB0YLQtdC80L3Ri9C5INC60L7QvdGC0LXQutGB0YIgLS0tCiAgICAgICAgdXNlciAtPiB0b2RvU3lzdGVtICLQl9Cw0L/Rg9GB0LrQsNC10YIgcHl0aG9uIG1haW4ucHksINGA0LDQsdC+0YLQsNC10YIg0YfQtdGA0LXQtyDQutC+0L3RgdC+0LvRjNC90L7QtSDQvNC10L3RjiIKICAgIH0KCiAgICB2aWV3cyB7CgogICAgICAgICMg0KPRgNC+0LLQtdC90YwgMSDigJQg0KHQuNGB0YLQtdC80L3Ri9C5INC60L7QvdGC0LXQutGB0YIKICAgICAgICBzeXN0ZW1Db250ZXh0IHRvZG9TeXN0ZW0gIkwxX1N5c3RlbUNvbnRleHQiICLQo9GA0L7QstC10L3RjCAxOiDQodC40YHRgtC10LzQvdGL0Lkg0LrQvtC90YLQtdC60YHRgiIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b0xheW91dAogICAgICAgIH0KCiAgICAgICAgIyDQo9GA0L7QstC10L3RjCAyIOKAlCDQmtC+0L3RgtC10LnQvdC10YDRiwogICAgICAgIGNvbnRhaW5lciB0b2RvU3lzdGVtICJMMl9Db250YWluZXJzIiAi0KPRgNC+0LLQtdC90YwgMjog0JrQvtC90YLQtdC50L3QtdGA0YsiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQKICAgICAgICB9CgogICAgICAgICMg0KPRgNC+0LLQtdC90YwgMyDigJQg0JrQvtC80L/QvtC90LXQvdGC0Ys6IENvbnNvbGUgQXBwCiAgICAgICAgY29tcG9uZW50IGNvbnNvbGVBcHAgIkwzX0NvbXBvbmVudHNfQXBwIiAi0KPRgNC+0LLQtdC90YwgMzog0JrQvtC80L/QvtC90LXQvdGC0YsgQ29uc29sZSBBcHAiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGluY2x1ZGUganNvbkZpbGVzCiAgICAgICAgICAgIGF1dG9MYXlvdXQKICAgICAgICB9CgogICAgICAgICMg0KPRgNC+0LLQtdC90YwgMyDigJQg0JrQvtC80L/QvtC90LXQvdGC0Ys6IEpTT04gRmlsZXMKICAgICAgICBjb21wb25lbnQganNvbkZpbGVzICJMM19Db21wb25lbnRzX0pTT04iICLQo9GA0L7QstC10L3RjCAzOiDQmtC+0LzQv9C+0L3QtdC90YLRiyBKU09OIEZpbGVzIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvTGF5b3V0CiAgICAgICAgfQoKICAgICAgICAjIC0tLSDQodGC0LjQu9C4IC0tLQogICAgICAgIHN0eWxlcyB7CiAgICAgICAgICAgIGVsZW1lbnQgIlBlcnNvbiIgewogICAgICAgICAgICAgICAgc2hhcGUgUGVyc29uCiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICMwODQyN0IKICAgICAgICAgICAgICAgIGNvbG9yICNmZmZmZmYKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJTb2Z0d2FyZSBTeXN0ZW0iIHsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzExNjhCRAogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgICAgIGVsZW1lbnQgIkNvbnRhaW5lciIgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZCAjNDM4REQ1CiAgICAgICAgICAgICAgICBjb2xvciAjZmZmZmZmCiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiQ29tcG9uZW50IiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kICM4NUJCRjAKICAgICAgICAgICAgICAgIGNvbG9yICMwMDAwMDAKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJEYXRhYmFzZSIgewogICAgICAgICAgICAgICAgc2hhcGUgQ3lsaW5kZXIKICAgICAgICAgICAgICAgIGJhY2tncm91bmQgIzQzOERENQogICAgICAgICAgICAgICAgY29sb3IgI2ZmZmZmZgogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQp9",
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.warning" : "0"
+  },
+  "views" : {
+    "componentViews" : [ {
+      "automaticLayout" : {
+        "edgeSeparation" : 50,
+        "nodeSeparation" : 50,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 100,
+        "vertices" : true
+      },
+      "containerId" : "3",
+      "description" : "Уровень 3: Компоненты Console App",
+      "elements" : [ {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "6",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "8",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "9",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "10",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "18",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "L3_Components_App",
+      "name" : "Component View: Console TODO App - Console App",
+      "order" : 3,
+      "relationships" : [ {
+        "id" : "11"
+      }, {
+        "id" : "12"
+      }, {
+        "id" : "13"
+      }, {
+        "id" : "14"
+      }, {
+        "id" : "15"
+      }, {
+        "id" : "16"
+      }, {
+        "id" : "17"
+      }, {
+        "id" : "22"
+      } ]
+    }, {
+      "automaticLayout" : {
+        "edgeSeparation" : 50,
+        "nodeSeparation" : 50,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 100,
+        "vertices" : true
+      },
+      "containerId" : "18",
+      "description" : "Уровень 3: Компоненты JSON Files",
+      "elements" : [ {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "19",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "20",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalContainerBoundariesVisible" : false,
+      "key" : "L3_Components_JSON",
+      "name" : "Component View: Console TODO App - JSON Files",
+      "order" : 4,
+      "relationships" : [ {
+        "id" : "23"
+      }, {
+        "id" : "26"
+      } ]
+    } ],
+    "configuration" : {
+      "styles" : {
+        "elements" : [ {
+          "background" : "#85bbf0",
+          "color" : "#000000",
+          "tag" : "Component"
+        }, {
+          "background" : "#438dd5",
+          "color" : "#ffffff",
+          "tag" : "Container"
+        }, {
+          "background" : "#438dd5",
+          "color" : "#ffffff",
+          "shape" : "Cylinder",
+          "tag" : "Database"
+        }, {
+          "background" : "#08427b",
+          "color" : "#ffffff",
+          "shape" : "Person",
+          "tag" : "Person"
+        }, {
+          "background" : "#1168bd",
+          "color" : "#ffffff",
+          "tag" : "Software System"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "automaticLayout" : {
+        "edgeSeparation" : 50,
+        "nodeSeparation" : 50,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 100,
+        "vertices" : true
+      },
+      "description" : "Уровень 2: Контейнеры",
+      "elements" : [ {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "18",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "L2_Containers",
+      "name" : "Container View: Console TODO App",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "24"
+      } ],
+      "softwareSystemId" : "2"
+    } ],
+    "systemContextViews" : [ {
+      "automaticLayout" : {
+        "edgeSeparation" : 50,
+        "nodeSeparation" : 50,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 100,
+        "vertices" : true
+      },
+      "description" : "Уровень 1: Системный контекст",
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "2",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "L1_SystemContext",
+      "name" : "System Context View: Console TODO App",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "27"
+      } ],
+      "softwareSystemId" : "2"
+    } ]
+  }
+}
