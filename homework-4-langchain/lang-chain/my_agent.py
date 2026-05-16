@@ -1,6 +1,8 @@
 # my_agent.py
 import os
 import sys
+import requests
+import json
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
@@ -10,12 +12,35 @@ from langchain_core.prompts import ChatPromptTemplate
 # 1. Загружаем API ключ из файла .env
 load_dotenv()
 
-# 2. Определяем инструмент (tool), который будет использовать агент
+# 2. Определяем инструменты (tools), которые будет использовать агент
 @tool
-def multiply(x: float, y: float) -> float:
-    """Умножает x на y."""
-    print(f"🔧 Вызываю инструмент 'multiply' с аргументами {x} и {y}")
-    return x * y
+def get_post(post_id: int) -> str:
+    """Получить пост по его ID. Параметр: целое число post_id."""
+    print(f"[API] Запрашиваем пост с id={post_id}")
+    url = f"https://jsonplaceholder.typicode.com/posts/{post_id}"
+    response = requests.get(url)
+    return json.loads(response.text) if response.status_code == 200 else "Пост не найден"
+
+@tool
+def get_user_posts(user_id: int):
+    """Получить все посты пользователя по его ID. Параметр: целое число user_id."""
+    print(f"[API] Запрашиваем посты пользователя с id={user_id}")
+    url = f"https://jsonplaceholder.typicode.com/posts?userId={user_id}"
+    response = requests.get(url)
+    return json.loads(response.text) if response.status_code == 200 else "Посты не найдены"
+
+@tool
+def create_post(title: str, body: str, userId: int):
+    """Создать новый пост. Параметры: title (строка), body (строка), userId (целое число)."""
+    print(f"[API] Создаем новый пост для пользователя с id={userId}")
+    url = "https://jsonplaceholder.typicode.com/posts"
+    payload = {
+        "title": title,
+        "body": body,
+        "userId": userId
+    }
+    response = requests.post(url, json=payload)
+    return json.loads(response.text) if response.status_code == 201 else "Ошибка при создании поста"
 
 # 3. Создаем экземпляр языковой модели
 llm = ChatOpenAI(
@@ -26,11 +51,27 @@ llm = ChatOpenAI(
 )
 
 # 4. Создаем список доступных инструментов
-tools = [multiply]
+tools = [get_post, get_user_posts, create_post]
 
 # 5. Создаем шаблон промпта для агента
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "Ты полезный ассистент. Используй доступные инструменты для ответа на вопросы."),
+    ("system", """Ты — API-оператор. У тебя есть доступ к трём инструментам:
+1. get_post(post_id) — получить пост по ID.
+2. get_user_posts(user_id) — получить все посты пользователя.
+3. create_post(title, body, userId) — создать новый пост.
+
+Всегда отвечай строго в формате:
+
+Status: success | error
+Action: какое действие выполнил (например, "вызван get_post с id=3")
+Data: результат API в удобном виде (если ошибка, то "None")
+Errors: описание ошибки или "None"
+
+Если пользователь спрашивает про пост — используй get_post.
+Если про все посты пользователя — get_user_posts.
+Если про создание — create_post.
+Никогда не выдумывай данные — только вызывай инструменты.
+"""),
     ("human", "{input}"),
     ("placeholder", "{agent_scratchpad}"),
 ])

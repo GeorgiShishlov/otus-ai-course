@@ -67,4 +67,38 @@ docker run -it --rm -p 8080:8080 `
 
 ---
 
-### ДЗ 4, 5 — _(в разработке)_
+### ДЗ 4 — Минимальный агент на LangChain
+
+Стек: Python, LangChain, langchain-classic, GPT-4o-mini (ProxyAPI)
+
+Папка: `homework-4-langchain/lang-chain`
+
+**Что сделано:**
+- Агент принимает запрос на естественном языке и вызывает нужный метод публичного API [JSONPlaceholder](https://jsonplaceholder.typicode.com)
+- Реализованы 3 LangChain-инструмента: `get_post`, `get_user_posts`, `create_post` — с реальными HTTP-вызовами через `requests`
+- Системный промпт задаёт роль API-оператора, ограничения и фиксированный формат ответа
+- Запуск из CLI: `python my_agent.py "Дай мне пост номер 5"`
+
+**Формат ответа агента:**
+```
+Status: success | error
+Action: описание действия
+Data: результат API
+Errors: описание ошибки или None
+```
+
+**Запуск:**
+```powershell
+cd homework-4-langchain/lang-chain
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env   # вставить PROXYAPI_KEY
+python my_agent.py "Дай мне пост номер 5"
+```
+
+**Отчёт и промпты:** `homework-4-langchain/lang-chain/report.md`
+
+---
+
+### ДЗ 5 — _(в разработке)_
