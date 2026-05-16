@@ -1,5 +1,6 @@
 # my_agent.py
 import os
+import sys
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
@@ -40,5 +41,6 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 # 7. Запускаем агента с запросом
 if __name__ == "__main__":
-    result = agent_executor.invoke({"input": "Сколько будет 15 умножить на 3?"})
+    user_input = sys.argv[1] if len(sys.argv) > 1 else "Сколько будет 15 умножить на 3?"
+    result = agent_executor.invoke({"input": user_input})
     print("\n📝 Итоговый ответ агента:", result["output"])
