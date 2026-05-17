@@ -1,13 +1,15 @@
 import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langgraph.graph import StateGraph, MessagesState, START, END
+from langgraph.graph import StateGraph, MessagesState, START
+from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.messages import HumanMessage, SystemMessage
+from tools import get_post, get_user_posts
 
 load_dotenv()
 
-# 1. Инициализируем LLM через ProxyAPI
+# LLM
 llm = ChatOpenAI(
     openai_api_key=os.getenv("PROXYAPI_KEY"),
     openai_api_base=os.getenv("OPENAI_BASE_URL"),
@@ -15,40 +17,66 @@ llm = ChatOpenAI(
     temperature=0
 )
 
-# 2. Определяем системный промпт
-SYSTEM_PROMPT = "Ты полезный ассистент. Отвечай кратко и по делу."
+# Список инструментов
+tools = [get_post, get_user_posts]
 
-# 3. Определяем функцию-узел (node)
+# Привязываем инструменты к LLM
+llm_with_tools = llm.bind_tools(tools)
+
+# Системный промпт с контрактом ответа
+SYSTEM_PROMPT = """
+Ты — API-оператор. У тебя есть доступ к инструментам:
+- get_post(post_id) — получить пост по ID
+- get_user_posts(user_id) — получить все посты пользователя
+
+Всегда отвечай в формате:
+Status: success/error
+Action: что сделал
+Data: результат API
+Errors: ошибки или None
+"""
+
 def call_model(state: MessagesState):
-    """Узел, который вызывает LLM и возвращает ответ"""
+    """Узел агента — принимает решение о вызове инструментов"""
     messages = state["messages"]
-    
-    # Добавляем системный промпт, если его нет
     if not messages or messages[0].type != "system":
         messages = [SystemMessage(content=SYSTEM_PROMPT)] + list(messages)
-    
-    response = llm.invoke(messages)
+
+    response = llm_with_tools.invoke(messages)
     return {"messages": [response]}
 
-# 4. Строим граф
-workflow = StateGraph(MessagesState)  # MessagesState уже содержит поле messages
-workflow.add_node("agent", call_model)  # добавляем узел "agent"
-workflow.add_edge(START, "agent")       # START → агент
-workflow.add_edge("agent", END)         # агент → конец
+# Строим граф
+workflow = StateGraph(MessagesState)
 
-# 5. Добавляем память (checkpointer)
+# Добавляем узлы
+workflow.add_node("agent", call_model)
+workflow.add_node("tools", ToolNode(tools))
+
+# Добавляем ребра
+workflow.add_edge(START, "agent")
+workflow.add_conditional_edges(
+    "agent",
+    tools_condition,  # встроенная функция: если есть tool_calls → "tools", иначе END
+)
+workflow.add_edge("tools", "agent")  # после инструментов — обратно к агенту
+
+# Добавляем память
 checkpointer = InMemorySaver()
 app = workflow.compile(checkpointer=checkpointer)
 
-# 6. Запускаем агента
+# Запуск
 if __name__ == "__main__":
-    config = {"configurable": {"thread_id": "user-123"}}
-    
-    user_input = input("Ваш вопрос: ")
-    
-    result = app.invoke(
-        {"messages": [HumanMessage(content=user_input)]},
-        config=config
-    )
-    
-    print("\nОтвет:", result["messages"][-1].content)
+    config = {"configurable": {"thread_id": "homework-1"}}
+
+    while True:
+        user_input = input("\nВы: ")
+        if user_input.lower() in ["exit", "quit"]:
+            break
+
+        result = app.invoke(
+            {"messages": [HumanMessage(content=user_input)]},
+            config=config
+        )
+
+        last_message = result["messages"][-1]
+        print("\nАгент:", last_message.content)

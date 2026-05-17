@@ -101,4 +101,31 @@ python my_agent.py "Дай мне пост номер 5"
 
 ---
 
+### ДЗ 4 (бонус) — Агент на LangGraph
+
+Стек: Python, LangGraph, LangChain, GPT-4o-mini (ProxyAPI)
+
+Папка: `homework-4-langchain/lang-graph`
+
+**Что сделано:**
+- Агент реализован на **LangGraph** `StateGraph` вместо `AgentExecutor`
+- Граф: `START → agent → [tools_condition] → tools → agent → END`
+- Реализованы 2 инструмента: `get_post`, `get_user_posts` — реальные HTTP-вызовы к [JSONPlaceholder](https://jsonplaceholder.typicode.com)
+- Системный промпт задаёт роль API-оператора и фиксированный контракт ответа
+- Интерактивный режим с историей диалога через `InMemorySaver`
+
+**Запуск:**
+```powershell
+cd homework-4-langchain/lang-graph
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env   # вставить PROXYAPI_KEY
+python agent.py
+```
+
+**Отчёт и промпты:** `homework-4-langchain/lang-graph/report.md`
+
+---
+
 ### ДЗ 5 — _(в разработке)_
