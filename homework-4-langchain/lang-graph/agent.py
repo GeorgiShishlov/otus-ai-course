@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, MessagesState, START
 from langgraph.prebuilt import ToolNode, tools_condition
-from langgraph.checkpoint.memory import InMemorySaver
 from langchain_core.messages import HumanMessage, SystemMessage
 from tools import get_post, get_user_posts
 
@@ -60,9 +59,7 @@ workflow.add_conditional_edges(
 )
 workflow.add_edge("tools", "agent")  # после инструментов — обратно к агенту
 
-# Добавляем память
-checkpointer = InMemorySaver()
-app = workflow.compile(checkpointer=checkpointer)
+app = workflow.compile()
 
 # Запуск
 if __name__ == "__main__":
