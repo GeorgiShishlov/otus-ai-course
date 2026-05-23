@@ -112,9 +112,9 @@ python my_agent.py "Дай мне пост номер 5"
 - Граф: `START → agent → [tools_condition] → tools → agent → END`
 - Реализованы 2 инструмента: `get_post`, `get_user_posts` — реальные HTTP-вызовы к [JSONPlaceholder](https://jsonplaceholder.typicode.com)
 - Системный промпт задаёт роль API-оператора и фиксированный контракт ответа
-- Интерактивный режим с историей диалога через `InMemorySaver`
+- Поддержка **LangGraph Studio** — визуальный интерфейс с графом и чатом
 
-**Запуск:**
+**Запуск (CLI):**
 ```powershell
 cd homework-4-langchain/lang-graph
 python -m venv venv
@@ -123,6 +123,13 @@ pip install -r requirements.txt
 copy .env.example .env   # вставить PROXYAPI_KEY
 python agent.py
 ```
+
+**Запуск (LangGraph Studio):**
+```powershell
+pip install -U "langgraph-cli[inmem]"
+langgraph dev
+```
+Открыть: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 
 **Отчёт и промпты:** `homework-4-langchain/lang-graph/report.md`
 
