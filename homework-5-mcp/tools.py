@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -33,6 +34,9 @@ def _safe_path(relative_path: str) -> Path | None:
 
 ALLOWED_PREFIXES = ["pytest", "python -m pytest", "flake8", "pip check"]
 SHELL_OPERATORS  = [";", "&&", "||", "|", ">", "<", "`", "$("]
+
+# Папки, которые пропускаем при поиске
+SKIP_DIRS = {".venv", ".git", "__pycache__", ".pytest_cache", "node_modules"}
 
 def get_doc(term: str) -> dict:
     """
@@ -132,7 +136,13 @@ def search_files(query: str, search_path: str = ".") -> dict:
     matches = []
     try:
         for file_path in sorted(target_dir.rglob("*")):
+            # Пропускаем служебные папки
+            if any(part in SKIP_DIRS for part in file_path.parts):
+                continue
             if not file_path.is_file():
+                continue
+            # Пропускаем бинарные файлы по расширению
+            if file_path.suffix in {".pyc", ".pyo", ".exe", ".dll", ".so"}:
                 continue
             try:
                 lines = file_path.read_text(encoding="utf-8", errors="ignore").splitlines()
@@ -165,12 +175,27 @@ def run_tests(command: str) -> dict:
     if not any(cmd.startswith(prefix) for prefix in ALLOWED_PREFIXES):
         return {"command": command, "output": None, "status": "error",
                 "error": f"Command not allowed. Allowed: {ALLOWED_PREFIXES}"}
+    # Заменяем 'pytest'/'flake8' на 'python -m pytest'/'python -m flake8'
+    # чтобы всегда использовался правильный интерпретатор из текущего окружения
+    py = sys.executable
+    if cmd.startswith("pytest"):
+        args = [py, "-m", "pytest"] + cmd[len("pytest"):].split()
+    elif cmd.startswith("python -m pytest"):
+        args = [py, "-m", "pytest"] + cmd[len("python -m pytest"):].split()
+    elif cmd.startswith("flake8"):
+        args = [py, "-m", "flake8"] + cmd[len("flake8"):].split()
+    elif cmd.startswith("pip check"):
+        args = [py, "-m", "pip", "check"]
+    else:
+        args = cmd.split()
+
     try:
         result = subprocess.run(
-            cmd.split(),
+            args,
             capture_output=True,
+            stdin=subprocess.DEVNULL,  # не наследуем stdin от MCP-сервера
             text=True,
-            timeout=60,
+            timeout=30,
             cwd=_get_project_root(),
         )
         output = result.stdout + result.stderr
