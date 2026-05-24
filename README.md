@@ -135,4 +135,28 @@ langgraph dev
 
 ---
 
-### ДЗ 5 — _(в разработке)_
+### ДЗ 5 — MCP-сервер
+
+Стек: Python 3.13, FastMCP, python-dotenv, pytest
+
+Папка: `homework-5-mcp`
+
+**Что сделано:**
+- MCP-сервер на FastMCP с транспортом stdio, интегрирован с Claude Code
+- 4 инструмента: `tool_get_doc`, `tool_read_file`, `tool_search_files`, `tool_run_tests`
+- Sandbox-защита файловых операций (PROJECT_ROOT), whitelist команд, блокировка shell-инъекций
+- Глоссарий AI/MCP-терминов (`docs/glossary.md`) как база знаний для `tool_get_doc`
+- Демо: 5 реальных вызовов tool из чата Claude Code (`demo/demo.md`)
+
+**Запуск Inspector:**
+```powershell
+cd homework-5-mcp
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+mcp dev server.py
+```
+
+**Интеграция с Claude Code:** открыть папку `homework-5-mcp` — `.mcp.json` подхватывается автоматически.
+
+**Документация:** `homework-5-mcp/README.md`
